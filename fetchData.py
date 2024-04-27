@@ -145,44 +145,46 @@ def get_metro_codes_hud(api_config: str) -> pd.DataFrame:
     return metro
 
 
-def fetch_metro_fmr_data(api_config: str, metro_code: str, start_year: int, end_year: int) -> pd.DataFrame:
-    """
-    This function takes a cbsa code for a metro area and
-    fetches the fair market rates during the years specified.
-    :param api_config: API configuration file path and name
-    :param metro_code: CBSA code for metro area
-    :param start_year: Starting year
-    :param end_year: Ending year
-    :return: DataFrame of fair market rates for the metro area.
-    """
-    config_file = api_config
-    config = ConfigParser()
-    config.read(config_file)
-    hud_key = config['API_Key']['HUD_key']
+# def fetch_metro_fmr_data(api_config: str, metro_code: str, start_year: int, end_year: int) -> pd.DataFrame:
+#     """
+#     This function takes a cbsa code for a metro area and
+#     fetches the fair market rates during the years specified.
+#     :param api_config: API configuration file path and name
+#     :param metro_code: CBSA code for metro area
+#     :param start_year: Starting year
+#     :param end_year: Ending year
+#     :return: DataFrame of fair market rates for the metro area.
+#     """
+#     config_file = api_config
+#     config = ConfigParser()
+#     config.read(config_file)
+#     hud_key = config['API_Key']['HUD_key']
+#
+#     hud_base_url = 'https://www.huduser.gov/hudapi/public/fmr'
+#     hud_headers = {"Authorization": "Bearer " + hud_key}
+#     data_endpoint = '/data/'
+#
+#     year_data = list()
+#     for year in range(start_year, end_year + 1):
+#         cbsa_code = metro_code
+#         data = requests.get(url=hud_base_url + data_endpoint + cbsa_code + '?year=' + str(year),
+#                             headers=hud_headers)
+#         if data.status_code == 200:
+#             year_data.append(data.json()['data']['basicdata'])
+#         time.sleep(2)
+#     metro_data = pd.DataFrame(year_data)
+#     metro_data = metro_data.astype(
+#         {'year': 'int16', 'Efficiency': 'Float32', 'One-Bedroom': 'Float32', 'Two-Bedroom': 'Float32',
+#          'Three-Bedroom': 'Float32', 'Four-Bedroom': 'Float32'})
+#     metro_data.set_index('year', inplace=True)
+#     return metro_data
 
-    hud_base_url = 'https://www.huduser.gov/hudapi/public/fmr'
-    hud_headers = {"Authorization": "Bearer " + hud_key}
-    data_endpoint = '/data/'
 
-    year_data = list()
-    for year in range(start_year, end_year + 1):
-        cbsa_code = metro_code
-        data = requests.get(url=hud_base_url + data_endpoint + cbsa_code + '?year=' + str(year),
-                            headers=hud_headers)
-        if data.status_code == 200:
-            year_data.append(data.json()['data']['basicdata'])
-        time.sleep(2)
-    metro_data = pd.DataFrame(year_data)
-    metro_data = metro_data.astype(
-        {'year': 'int16', 'Efficiency': 'Float32', 'One-Bedroom': 'Float32', 'Two-Bedroom': 'Float32',
-         'Three-Bedroom': 'Float32', 'Four-Bedroom': 'Float32'})
-    metro_data.set_index('year', inplace=True)
-    return metro_data
-
-
-def fetch_state_fmr_data(api_config: str, start_year: int, end_year: int, state_code: str) -> pd.DataFrame:
+def fetch_state_fmr_data(api_config: str, start_year: int, end_year: int, state_code: str,
+                         implementation_month: int) -> pd.DataFrame:
     """
     Fetch the metro area data for all the metro areas in the state for the mentioned time period.
+    :param implementation_month: The month in which FMRs are implemented
     :param api_config: API configuration file path and name
     :param start_year: Starting year
     :param end_year: Ending year
@@ -218,17 +220,19 @@ def fetch_state_fmr_data(api_config: str, start_year: int, end_year: int, state_
         {'year': 'string', 'code': 'string', 'Efficiency': 'Float32', 'One-Bedroom': 'Float32',
          'Two-Bedroom': 'Float32', 'Three-Bedroom': 'Float32', 'Four-Bedroom': 'Float32'})
 
-    def date_parser(x: str):
-        """
-        Parse the year to a datetime object, and set the date to 1st October.
-        1st October is the date on which the FMRs become effective every year.
-        :param x: String containing the year
-        :return: Datetime object
-        """
-        x = "10-" + x
-        return datetime.strptime(x, '%m-%Y')
+    # def date_parser(x: str, month=implementation_month):
+    #     """
+    #     Parse the year to a datetime object, and set the date to 1st October.
+    #     1st October is the date on which the FMRs become effective every year.
+    #     :param month: The month in which FMRs are implemented
+    #     :param x: String containing the year
+    #     :return: Datetime object
+    #     """
+    #     x = str(month) + '-' + x
+    #     return datetime.strptime(x, '%m-%Y')
 
-    metro_data['year'] = metro_data['year'].apply(lambda x: date_parser(x))
+    metro_data['year'] = (metro_data['year'].
+                          apply(lambda x: datetime.strptime(str(implementation_month) + '-' + x, '%m-%Y')))
     return metro_data
 
 
