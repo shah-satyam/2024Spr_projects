@@ -214,7 +214,7 @@ def fetch_state_fmr_data(api_config: str, start_year: int, end_year: int, state_
                 del d['statename']
                 del d['statecode']
                 year_data.append(d)
-        time.sleep(2)
+        time.sleep(1.1)
     metro_data = pd.DataFrame(year_data)
     metro_data = metro_data.astype(
         {'year': 'string', 'code': 'string', 'Efficiency': 'Float32', 'One-Bedroom': 'Float32',

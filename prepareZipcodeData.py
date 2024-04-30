@@ -11,29 +11,6 @@ import math
 import os
 
 
-# def assign_col_names(use_cols: list) -> dict:
-#     """
-#
-#     :param use_cols:
-#     :return:
-#     """
-#     assign_names = dict()
-#     for col in range(len(use_cols)):
-#         if col == 0:
-#             assign_names[use_cols[col]] = 'ZIPCODE'
-#         elif col == 1:
-#             assign_names[use_cols[col]] = 'Efficiency'
-#         elif col == 2:
-#             assign_names[use_cols[col]] = 'One-Bedroom'
-#         elif col == 3:
-#             assign_names[use_cols[col]] = 'Two-Bedroom'
-#         elif col == 4:
-#             assign_names[use_cols[col]] = 'Three-Bedroom'
-#         elif col == 5:
-#             assign_names[use_cols[col]] = 'Four-Bedroom'
-#     return assign_names
-
-
 def load_one_fmr_file(filename: str, path: str) -> pd.DataFrame:
     """
 
@@ -48,7 +25,7 @@ def load_one_fmr_file(filename: str, path: str) -> pd.DataFrame:
     column_variation_4 = ['zipcode', 'area_rent_br0', 'area_rent_br1', 'area_rent_br2', 'area_rent_br3',
                           'area_rent_br4']
     column_variation_5 = ['ZIP', 'area_rent_br0', 'area_rent_br1', 'area_rent_br2', 'area_rent_br3', 'area_rent_br4']
-    datatypes = ['str', 'Int16', 'Int16', 'Int16', 'Int16', 'Int16']
+    datatypes = ['str', 'Float32', 'Float32', 'Float32', 'Float32', 'Float32']
     actual_col_names = ['ZIPCODE', 'Efficiency', 'One-Bedroom', 'Two-Bedroom', 'Three-Bedroom', 'Four-Bedroom']
     string = filename.lower()
     year = re.search('fy\d\d\d\d', string=string).group()
@@ -108,6 +85,7 @@ def load_all_fmr_files(file_directory='Data/HUD FMR') -> pd.DataFrame:
             df_zip = df_zip.merge(data_zip, how='inner', on='ZIPCODE')
     df_final = (pd.merge(df, df_zip, how='inner', on='ZIPCODE')
                 .sort_values(['Date', 'ZIPCODE'], ascending=True).reset_index(drop=True))
+    df_final = merge_area_code_zipcode(df_final, file_directory)
     return df_final
 
 
@@ -132,7 +110,32 @@ def common_zipcode_mean(fmr_data: pd.DataFrame) -> pd.DataFrame:
     return fmr_data
 
 
+def merge_area_code_zipcode(fmr_data: pd.DataFrame, file_directory='Data/HUD FMR') -> pd.DataFrame:
+    """
+
+    :param fmr_data:
+    :param file_directory:
+    :return:
+    """
+    max_year = 0
+    fmr_file_name = glob.glob(file_directory + '/*.csv')
+    map_year = dict()
+    for file in range(len(fmr_file_name)):
+        string = os.path.basename(fmr_file_name[file])
+        string = string.lower()
+        year = re.search('fy\d\d\d\d', string=string).group()
+        year = int(re.sub('\D', '', year))
+        map_year[year] = fmr_file_name[file]
+        if year > max_year:
+            max_year = year
+    path = map_year[max_year]
+    codes = pd.read_excel(path, usecols=['ZIP\nCode', 'HUD Area Code'], dtype='string').rename(
+        columns={'ZIP\nCode': 'ZIPCODE', 'HUD Area Code': 'Metro_Codes'})
+    df = pd.merge(fmr_data, codes, how='left', on='ZIPCODE')
+    return df
+
+
 if __name__ == '__main__':
     zip_data = load_all_fmr_files(file_directory='Data/HUD FMR')
-    zip_data.to_csv('Data/Processed Data/zipcode_fmrs.csv')
+    zip_data.to_csv('Data/Processed Data/zipcode_fmrs.csv', index=False)
     print('Data Processing Complete')
