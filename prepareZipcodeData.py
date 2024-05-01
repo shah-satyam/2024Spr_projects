@@ -12,12 +12,6 @@ import os
 
 
 def load_one_fmr_file(filename: str, path: str) -> pd.DataFrame:
-    """
-
-    :param filename:
-    :param path:
-    :return:
-    """
     column_variation_1 = ['ZIP\nCode', 'SAFMR\n0BR', 'SAFMR\n1BR', 'SAFMR\n2BR', 'SAFMR\n3BR', 'SAFMR\n4BR']
     column_variation_2 = ['zcta', 'safmr_0br', 'safmr_1br', 'safmr_2br', 'safmr_3br', 'safmr_4br']
     column_variation_3 = ['zip_code', 'area_rent_br0', 'area_rent_br1', 'area_rent_br2', 'area_rent_br3',
@@ -90,11 +84,6 @@ def load_all_fmr_files(file_directory='Data/HUD FMR') -> pd.DataFrame:
 
 
 def common_zipcode_mean(fmr_data: pd.DataFrame) -> pd.DataFrame:
-    """
-
-    :param fmr_data:
-    :return:
-    """
     cols = list(fmr_data.columns)
     non_unique = fmr_data[[cols[0], cols[1]]].groupby(cols[0]).count()
     zips = list(non_unique[non_unique[cols[1]] > 1].index)
@@ -111,12 +100,6 @@ def common_zipcode_mean(fmr_data: pd.DataFrame) -> pd.DataFrame:
 
 
 def merge_area_code_zipcode(fmr_data: pd.DataFrame, file_directory='Data/HUD FMR') -> pd.DataFrame:
-    """
-
-    :param fmr_data:
-    :param file_directory:
-    :return:
-    """
     max_year = 0
     fmr_file_name = glob.glob(file_directory + '/*.csv')
     map_year = dict()

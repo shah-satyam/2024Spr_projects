@@ -45,7 +45,7 @@ def smooth_and_merge(cpi: pd.DataFrame, fmr: pd.DataFrame, start_month: int) -> 
     month = month_map[start_month]
     freq = 'YS-'+month
     cpi = cpi.groupby(pd.Grouper(freq=freq)).mean()
-    combined = pd.merge(fmr.set_index('year'), cpi, how='inner', left_index=True, right_index=True)
+    combined = pd.merge(fmr.set_index('Date'), cpi, how='inner', left_index=True, right_index=True)
     combined['Mean_Rent'] = combined[['Efficiency', 'One-Bedroom',
                                       'Two-Bedroom', 'Three-Bedroom', 'Four-Bedroom', 'CPI']].mean(axis=1)
     return combined[['Efficiency', 'One-Bedroom', 'Two-Bedroom', 'Three-Bedroom', 'Four-Bedroom', 'Mean_Rent', 'CPI']]

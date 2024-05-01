@@ -207,7 +207,7 @@ def fetch_state_fmr_data(api_config: str, start_year: int, end_year: int, state_
         if data.status_code == 200:
             add_data = data.json()['data']['metroareas']
             for d in add_data:
-                d['year'] = data.json()['data']['year']
+                d['Date'] = data.json()['data']['year']
                 del d['metro_name']
                 del d['FMR Percentile']
                 del d['smallarea_status']
@@ -217,33 +217,30 @@ def fetch_state_fmr_data(api_config: str, start_year: int, end_year: int, state_
         time.sleep(1.1)
     metro_data = pd.DataFrame(year_data)
     metro_data = metro_data.astype(
-        {'year': 'string', 'code': 'string', 'Efficiency': 'Float32', 'One-Bedroom': 'Float32',
+        {'Date': 'string', 'code': 'string', 'Efficiency': 'Float32', 'One-Bedroom': 'Float32',
          'Two-Bedroom': 'Float32', 'Three-Bedroom': 'Float32', 'Four-Bedroom': 'Float32'})
 
-    # def date_parser(x: str, month=implementation_month):
-    #     """
-    #     Parse the year to a datetime object, and set the date to 1st October.
-    #     1st October is the date on which the FMRs become effective every year.
-    #     :param month: The month in which FMRs are implemented
-    #     :param x: String containing the year
-    #     :return: Datetime object
-    #     """
-    #     x = str(month) + '-' + x
-    #     return datetime.strptime(x, '%m-%Y')
-
-    metro_data['year'] = (metro_data['year'].
+    metro_data['Date'] = (metro_data['Date'].
                           apply(lambda x: datetime.strptime(str(implementation_month) + '-' + x, '%m-%Y')))
     return metro_data
 
 
-def select_area(merge_data: pd.DataFrame) -> str | None:
+def select_area(df: pd.DataFrame, region: str) -> str | None:
     """
     This is an interactive function that selects a specific metro area and returns it's index.
-    :param merge_data: Merged HUD and BLS data containing metro areas.
+    :param region:
+    :param df: Merged HUD and BLS data containing metro areas.
     :return: Index of the selected metro area.
     """
-    input_text = ("Which metro area are you interested in? \n (Provide the index based on the dataframe displayed "
-                  "above) \n Enter 'Q/q' if you want to quit")
+    if region.lower() != 'metro' and region.lower() != 'zip':
+        raise ValueError('Region must be either "metro" or "zip"')
+
+    if region.lower() == 'metro':
+        input_text = ("Which metro area are you interested in? \n (Provide the index based on the dataframe displayed "
+                      "above) \n Enter 'Q/q' if you want to quit")
+    else:
+        input_text = ("Which zip code are you interested in? \n (Provide the index based on the dataframe displayed "
+                      "above) \n Enter 'Q/q' if you want to quit")
     while True:
         index = input(input_text)
         if index.lower() == 'q':
@@ -251,11 +248,14 @@ def select_area(merge_data: pd.DataFrame) -> str | None:
             print('No area was selected')
             break
         if index.isdigit():
-            if int(index) < len(merge_data):
-                print(merge_data['area_name'].loc[int(index)] + " has been selected")
+            if int(index) < len(df):
+                if region.lower() == 'metro':
+                    print(df['area_name'].loc[int(index)] + " has been selected")
+                else:
+                    print(df.loc[int(index), 'ZIPCODE'] + " has been selected")
                 break
             else:
                 index = None
                 input_text = 'Please enter a valid index: ' + 'select from range(0, ' + str(
-                    len(merge_data) - 1) + ')\n' + input_text
+                    len(df) - 1) + ')\n' + input_text
     return index
