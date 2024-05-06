@@ -11,10 +11,10 @@ _Note:_
    2. *BLS API has a limit of 500 queries daily. Additionally, we can only request for up to 20 years of data at a time.*
 
 ## Environment Setup
-Execute the following command to install the requirements:\
+Execute the following command to install the requirements:
 
 _Note: Open the terminal with your python environment in the project directory containing the 'requirements.txt' file.\
-If you are using Pycharm, then it will prompt to install all the missing requirements._\
+If you are using Pycharm, then it will prompt to install all the missing requirements._
 
 `pip install -r requirements.txt`
 
