@@ -161,7 +161,7 @@ def get_metro_codes_hud(api_config: str) -> pd.DataFrame:
     >>> print(hud_metro_data.loc[hud_metro_data['area_name'].str.contains('Champaign')].reset_index(drop=True))
               cbsa_code         area_name area_state
     0  METRO16580M16580  Champaign-Urbana         IL
-    >>> hud_metro_data = get_metro_codes_hud(api_config='Data/Test Data/API_Config.ini')
+    >>> hud_metro_data = get_metro_codes_hud(api_config='Data/Test Data/API_Config.ini')    # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
     KeyError: 'API_Key'
@@ -215,16 +215,16 @@ def fetch_state_fmr_data(api_config: str, start_year: int, end_year: int, state_
     :param state_code: 2 digit state code
     :return: DataFrame of metro area data for all the metro areas in the state.
 
-    >>> test_data = fetch_state_fmr_data(api_config='API_Config.ini', start_year=2014, end_year=2024, state_code='AB', implementation_month=2)
+    >>> test_data = fetch_state_fmr_data(api_config='API_Config.ini', start_year=2014, end_year=2024, state_code='AB', implementation_month=2)  # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
     ValueError: No data found for state_code AB, ensure you have entered the correct state code
-    >>> test_data = fetch_state_fmr_data(api_config='Data/Test Data/API_Config.ini', start_year=2014, end_year=2024, state_code='AB', implementation_month=2)
+    >>> test_data = fetch_state_fmr_data(api_config='Data/Test Data/API_Config.ini', start_year=2014, end_year=2024, state_code='AB', implementation_month=2)   # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
     KeyError: 'API_Key'
     >>> test_data = fetch_state_fmr_data(api_config='API_Config.ini', start_year=2017, end_year=2018, state_code='IL', implementation_month=2)
-    >>> print(test_data.loc[test_data['code'] == 'METRO16580M16580', ['code', 'Efficiency', 'Date']].reset_index(drop=True))
+    >>> print(test_data.loc[test_data['code'] == 'METRO16580M16580', ['code', 'Efficiency', 'Date']].reset_index(drop=True))    # doctest: +ELLIPSIS
                    code  Efficiency       Date
     0  METRO16580M16580       544.0 2017-02-01
     1  METRO16580M16580       615.0 2018-02-01
@@ -281,7 +281,7 @@ def select_area(df: pd.DataFrame, region: str) -> str:
     :return: Index of the selected metro area.
 
     >>> test_data = pd.read_csv('Data/Test Data/metro_list_test.csv', dtype='string')
-    >>> test_input = select_area(df=test_data, region='AB')
+    >>> test_input = select_area(df=test_data, region='AB') # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
     ValueError: Region must be either "metro" or "zip"
