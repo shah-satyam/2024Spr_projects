@@ -22,7 +22,7 @@ def transform_cpi_data(df: pd.DataFrame) -> pd.DataFrame:
     >>> print(len(list(test_data_t.index)))
     37
     >>> print(test_data_t.shape)
-    (37,1)
+    (37, 1)
     """
     years = df.index
     df_t = pd.DataFrame()
