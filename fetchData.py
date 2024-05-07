@@ -22,16 +22,23 @@ def fetch_metro_cpi_bls(api_config: str, area_code: int, start_year: int, end_ye
     :param end_year: Ending year
     :return: Dictionary of monthly CPI data
     """
+    # https://www.youtube.com/watch?v=Gdw0-QGq-z0
     config_file = api_config
     config = ConfigParser()
     config.read(config_file)
     bls_key = config['API_Key']['BLS_key']
 
+    # https://stackoverflow.com/questions/29931671/making-an-api-call-in-python-with-an-api-that-requires-a-bearer-token
     bls_base_url = 'https://api.bls.gov/publicAPI/v2/timeseries/data/'
     bls_headers = {'Content-type': 'application/json', 'Authorization': 'Bearer ' + bls_key}
     series_id = list()
     series_id.append(area_code)
 
+    # https://www.bls.gov/bls/api_features.htm
+    if end_year-start_year > 20:
+        raise ValueError('Time period exceeds API limit. Can only fetch data for upto 20 years')
+
+    # https://www.bls.gov/developers/api_python.htm#python2
     bls_metro_data = json.dumps({"seriesid": series_id, "startyear": start_year, "endyear": end_year})
     response = requests.post(url=bls_base_url, data=bls_metro_data, headers=bls_headers)
     bls_response = response.json()['Results']['series']
@@ -86,7 +93,6 @@ def get_bls_series_id(metro_code_file='Data/BLS/cu.area.txt',
         """
         x = x.split(',')
         if len(x) > 1:
-            # x = x[1].split(' ')
             return x[1].strip()
         else:
             x = x[0].split(' ')
@@ -99,6 +105,8 @@ def get_bls_series_id(metro_code_file='Data/BLS/cu.area.txt',
     code['area_name'] = code['old_area_name'].apply(lambda x: area_parser(x))
     code['area_state'] = code['old_area_name'].apply(lambda x: state_parser(x))
     code.drop(['old_area_name'], axis=1, inplace=True)
+
+    #https://www.bls.gov/help/hlpforma.htm#CU
     code['area_code'] = series_id_prefix + code['area_code'] + series_id_suffix
     code = code.astype({'area_name': 'string', 'area_state': 'string'})
     return code
@@ -145,41 +153,6 @@ def get_metro_codes_hud(api_config: str) -> pd.DataFrame:
     return metro
 
 
-# def fetch_metro_fmr_data(api_config: str, metro_code: str, start_year: int, end_year: int) -> pd.DataFrame:
-#     """
-#     This function takes a cbsa code for a metro area and
-#     fetches the fair market rates during the years specified.
-#     :param api_config: API configuration file path and name
-#     :param metro_code: CBSA code for metro area
-#     :param start_year: Starting year
-#     :param end_year: Ending year
-#     :return: DataFrame of fair market rates for the metro area.
-#     """
-#     config_file = api_config
-#     config = ConfigParser()
-#     config.read(config_file)
-#     hud_key = config['API_Key']['HUD_key']
-#
-#     hud_base_url = 'https://www.huduser.gov/hudapi/public/fmr'
-#     hud_headers = {"Authorization": "Bearer " + hud_key}
-#     data_endpoint = '/data/'
-#
-#     year_data = list()
-#     for year in range(start_year, end_year + 1):
-#         cbsa_code = metro_code
-#         data = requests.get(url=hud_base_url + data_endpoint + cbsa_code + '?year=' + str(year),
-#                             headers=hud_headers)
-#         if data.status_code == 200:
-#             year_data.append(data.json()['data']['basicdata'])
-#         time.sleep(2)
-#     metro_data = pd.DataFrame(year_data)
-#     metro_data = metro_data.astype(
-#         {'year': 'int16', 'Efficiency': 'Float32', 'One-Bedroom': 'Float32', 'Two-Bedroom': 'Float32',
-#          'Three-Bedroom': 'Float32', 'Four-Bedroom': 'Float32'})
-#     metro_data.set_index('year', inplace=True)
-#     return metro_data
-
-
 def fetch_state_fmr_data(api_config: str, start_year: int, end_year: int, state_code: str,
                          implementation_month: int) -> pd.DataFrame:
     """
@@ -214,7 +187,9 @@ def fetch_state_fmr_data(api_config: str, start_year: int, end_year: int, state_
                 del d['statename']
                 del d['statecode']
                 year_data.append(d)
-        time.sleep(1.1)
+
+        # https://www.huduser.gov/portal/dataset/api-terms-of-service.html
+        time.sleep(1.1)  # to ensure that there is at least 1 second gap between 2 API calls.
     metro_data = pd.DataFrame(year_data)
     metro_data = metro_data.astype(
         {'Date': 'string', 'code': 'string', 'Efficiency': 'Float32', 'One-Bedroom': 'Float32',
@@ -227,7 +202,7 @@ def fetch_state_fmr_data(api_config: str, start_year: int, end_year: int, state_
 
 def select_area(df: pd.DataFrame, region: str) -> str | None:
     """
-    This is an interactive function that selects a specific metro area and returns it's index.
+    This is an interactive function that selects a specific metro area and returns its index.
     :param region:
     :param df: Merged HUD and BLS data containing metro areas.
     :return: Index of the selected metro area.
@@ -255,7 +230,6 @@ def select_area(df: pd.DataFrame, region: str) -> str | None:
                     print(df.loc[int(index), 'ZIPCODE'] + " has been selected")
                 break
             else:
-                index = None
                 input_text = 'Please enter a valid index: ' + 'select from range(0, ' + str(
                     len(df) - 1) + ')\n' + input_text
     return index
