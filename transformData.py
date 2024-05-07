@@ -14,6 +14,15 @@ def transform_cpi_data(df: pd.DataFrame) -> pd.DataFrame:
 
     :param df: CPI dataframe as fetched from BLS API
     :return: CPI dataframe with a column called 'CPI'
+
+    >>> test_data = pd.read_pickle('Data/Test Data/cpi_test_data')  # https://stackoverflow.com/questions/17098654/how-to-reversibly-store-and-load-a-pandas-dataframe-to-from-disk
+    >>> test_data_t = transform_cpi_data(test_data)
+    >>> print(list(test_data_t.index)) # doctest: +ELLIPSIS
+    [Timestamp('2017-11-01 00:00:00'), ..., Timestamp('2021-03-01 00:00:00'), ..., Timestamp('2023-11-01 00:00:00')]
+    >>> print(len(list(test_data_t.index)))
+    37
+    >>> print(test_data_t.shape)
+    (37,1)
     """
     years = df.index
     df_t = pd.DataFrame()
@@ -42,7 +51,24 @@ def smooth_and_merge(cpi: pd.DataFrame, fmr: pd.DataFrame, start_month: int) -> 
     :param fmr: Metro area FMR dataframe
     :param start_month: FMR rates implementation month (int)
     :return: Dataframe with FMR data and its corresponding CPI
+
+    >>> test_cpi_t = transform_cpi_data(pd.read_pickle('Data/Test Data/cpi_test_data'))
+    >>> test_cbsa = pd.read_pickle('Data/Test Data/cbsa_data_dec_test')
+    >>> merge = smooth_and_merge(test_cpi_t, test_cbsa, start_month=10)
+    >>> print(list(merge.index)) # doctest: +ELLIPSIS
+    [Timestamp('2017-10-01 00:00:00'), ..., Timestamp('2023-10-01 00:00:00')]
+    >>> test_cbsa = pd.read_pickle('Data/Test Data/cbsa_data_jun_test')
+    >>> merge = smooth_and_merge(test_cpi_t, test_cbsa, start_month=6)
+    >>> print(list(merge.index)) # doctest: +ELLIPSIS
+    [Timestamp('2017-06-01 00:00:00'), ..., Timestamp('2023-06-01 00:00:00')]
+    >>> merge = smooth_and_merge(test_cpi_t, test_cbsa, start_month=13) # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    ValueError: start_month must be between 1 and 12
     """
+
+    if not (1 <= start_month <= 12):
+        raise ValueError('start_month must be between 1 and 12')
 
     # https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
     month_map = {1: 'JAN', 2: 'FEB', 3: 'MAR', 4: 'APR', 5: 'MAY', 6: 'JUN',
