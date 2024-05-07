@@ -27,6 +27,13 @@ def lag_calculator(df: pd.DataFrame, field_to_analyze: str, estimated_lag=2, use
         raise ValueError(f'Field {field_to_analyze} is not acceptable\n Valid options are {acceptable_values}')
     df = df[[field_to_analyze, 'CPI']]
 
+    # There might be a correlation between percentage change in FMR and CPI, but it might not necessarily be
+    # linear in nature.
+    # Which means that even if the shape of the graph may have similar shape, it would not
+    # be close or overlapping on the graph.
+    # To better visualize the correlation in trends, normalizing the data to bring it on the same scale.
+    df = (df - df.min()) / (df.max() - df.min())
+
     def plot_lag(data: pd.DataFrame, time_lag: int) -> None:
         """
         Inner function to plot the time lagged impact of CPI on the fair market rates.
@@ -54,13 +61,6 @@ def lag_calculator(df: pd.DataFrame, field_to_analyze: str, estimated_lag=2, use
         for lag in range(0, 4):
             shift_data = df.copy()
             shift_data['CPI'] = shift_data['CPI'].shift(lag)
-
-            # There might be a correlation between percentage change in FMR and CPI, but it might not necessarily be
-            # linear in nature.
-            # Which means that even if the shape of the graph may have similar shape, it would not
-            # be close or overlapping on the graph.
-            # To better visualize the correlation in trends, normalizing the data to bring it on the same scale.
-            shift_data = (shift_data - shift_data.mean()) / shift_data.std()
             corr = shift_data.corr().loc[field_to_analyze, 'CPI']
             if corr > best_corr:
                 best_corr = corr
@@ -101,8 +101,7 @@ def zipcodes_trends(df: pd.DataFrame, field_to_analyze: str) -> pd.DataFrame:
 
     # list of unique zip codes in the area:
     zips = list(df['ZIPCODE'].unique())
-    total_zips = zips.__len__()
-
+    
     # Getting the data to be analyzed.
     df = df[['ZIPCODE', field_to_analyze, 'Date']]
 
