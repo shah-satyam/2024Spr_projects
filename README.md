@@ -40,7 +40,30 @@ _Hypothesis 2:_ Areas of anomalies in the FMR prices can be detected by studying
 3. After metropolitan-area level analysis, provide a zipcode to carry out a deeper analysis for that zipcode.
 
 
+## Example
+In this example, I am carrying out analysis for the 'San Diego-Carlsbad' metropolitan area.
 
+After going through the initial data preparation, the notebook prompts you to select an area:
+![img.png](/Example%20Plots/img.png)
+
+It then fetches the MR and CPI data for this area, and based on it computed the lag in FMR and CPI.
+It does this for mean rent as well as all the four apartment types.
+Along with the individual graph, it also provides a combined graph for CPI,
+shifted CPI and FMR for all the four apartment types.
+![img_1.png](/Example%20Plots/img_1.png)
+
+The second part deals with zipcode level analysis.
+For the metro area selected,
+it determines the zipcodes that deviated the most as compared to the mean rent for the metro area.
+![img_2.png](/Example%20Plots/img_2.png)
+
+The notebook then prompts you to select a zipcode to plot its FMR trend against the metro's FMR and CPI (shifted) trend
+![img_3.png](/Example%20Plots/img_3.png)
+![img_4.png](/Example%20Plots/img_4.png)
+This is for a zipcode that is marked as an anomaly
+
+A similar plot can be created for a zipcode that is in line with the FMR and CPI (shifted) trend of the metro area.
+![img_5.png](/Example%20Plots/img_5.png)
 
 ## References
 1. Data Sources:
@@ -56,6 +79,8 @@ _Hypothesis 2:_ Areas of anomalies in the FMR prices can be detected by studying
    4. Smoothing timeseries data: https://www.youtube.com/watch?v=PFQme5QfpaI
    5. Using time offsets with pandas Grouper: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
    6. Using Config files for API keys: https://www.youtube.com/watch?v=Gdw0-QGq-z0
+   7. Saving dataframe to file: https://stackoverflow.com/questions/17098654/how-to-reversibly-store-and-load-a-pandas-dataframe-to-from-disk
+   8. Regex pattern matching: https://www.w3schools.com/python/python_regex.asp
 3. FMR implementation date: https://www.huduser.gov/periodicals/ushmc/winter98/summary-2.html
 4. HUD API limitations: https://www.huduser.gov/portal/dataset/api-terms-of-service.html
 5. BLS API Limitations: https://www.bls.gov/bls/api_features.htm
