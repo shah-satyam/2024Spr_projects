@@ -19,6 +19,13 @@ def lag_calculator(df: pd.DataFrame, field_to_analyze: str, estimated_lag=2, use
     :param estimated_lag: Provide an estimated lag for the fair market rates.
     :param use_estimate: 'Ture' if you want to plot lag using the estimated lag.
     :return: No return value. Plots a graph showing the time lagged impact of CPI on the fair market rates.
+
+    >>> test_data = pd.read_csv('Data/Test Data/laf_calculator_test.csv', dtype={'Efficiency':'Float32', 'One-Bedroom':'Float32', 'Two-Bedroom':'Float32', 'Three-Bedroom':'Float32', 'Four-Bedroom':'Float32', 'Mean_Rent':'Float32', 'CPI':'Float32', 'Date':'string'})
+    >>> test_data['Date'] = pd.to_datetime(test_data['Date'])
+    >>> test_data.set_index('Date', inplace=True)
+    >>> lag_calculator(test_data, field_to_analyze='Mean_Rent')
+    The lag between the free market rate implemented and the consumer price index is:  2
+    The correlation Mean_Rent and consumer price index, after a 2 year lag is: 0.91
     """
 
     # Checking if the provided field is acceptable
@@ -94,6 +101,18 @@ def zipcodes_trends(df: pd.DataFrame, field_to_analyze: str) -> pd.DataFrame:
     'Four-Bedroom', 'Mean_Rent']
     :return: The number of years for which a zipcode was less than 2 std, greater than 2 std,
     and the total number of years when it was marked as an anomaly.
+
+    >>> test_data = pd.read_csv('Data/Test Data/zipcode_outlier_test.csv', dtype={'ZIPCODE':'string', 'Date':'string'})
+    >>> test_data['Date'] = pd.to_datetime(test_data['Date'])
+    >>> print(zipcodes_trends(test_data, 'Mean_Rent'))  # doctest: +ELLIPSIS
+        ZIPCODE  Above STD  Below STD  Total  Mean_growth_rate
+    0     91931          3          2      5          0.213810
+    1     91916          3          1      4          0.169973
+    ...
+    139   92672          0          0      0          0.062255
+    ...
+    [140 rows x 5 columns]
+
     """
     acceptable_values = ['Efficiency', 'One-Bedroom', 'Two-Bedroom', 'Three-Bedroom', 'Four-Bedroom', 'Mean_Rent']
     if field_to_analyze not in acceptable_values:
@@ -174,3 +193,8 @@ def plot_zipcode_trends(df: pd.DataFrame, field_to_analyze: str, zipcode: str,
     plt.ylabel('Percentage Change')
     plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5), fontsize=9)
     plt.show()
+
+
+if __name__ == '__main__':
+    pass
+

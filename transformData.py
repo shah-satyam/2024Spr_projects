@@ -85,3 +85,9 @@ def smooth_and_merge(cpi: pd.DataFrame, fmr: pd.DataFrame, start_month: int) -> 
                                       'Two-Bedroom', 'Three-Bedroom', 'Four-Bedroom', 'CPI']].mean(axis=1)
 
     return combined[['Efficiency', 'One-Bedroom', 'Two-Bedroom', 'Three-Bedroom', 'Four-Bedroom', 'Mean_Rent', 'CPI']]
+
+
+if __name__ == '__main__':
+    pass
+
+

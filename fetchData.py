@@ -319,3 +319,9 @@ def select_area(df: pd.DataFrame, region: str) -> str:
             input_text = 'Please enter an integer: ' + 'select from range(0, ' + str(
                 len(df) - 1) + ')'
     raise ValueError('Maximum number of attempts exhausted!')
+
+
+if __name__ == '__main__':
+    pass
+
+
