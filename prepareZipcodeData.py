@@ -39,8 +39,9 @@ def load_one_fmr_file(filename: str, path: str) -> pd.DataFrame:
     # extracting the year for which the file was released, using the file name.
     # I noticed that each file has a section contain year in the format - 'fy' followed by the year.
     # using this pattern to figure out the year of the file.
+    # https://www.w3schools.com/python/python_regex.asp
     string = filename.lower()
-    year = re.search('fy\d\d\d\d', string=string).group()
+    year = re.search('fy\d{4}', string=string).group()
     year = int(re.sub('\D', '', year))
 
     # based on the year of the file, using the relevant column names and mapping them to appropriate datatypes.
@@ -180,7 +181,7 @@ def merge_area_code_zipcode(fmr_data: pd.DataFrame, file_directory='Data/HUD FMR
     for file in range(len(fmr_file_name)):
         string = os.path.basename(fmr_file_name[file])
         string = string.lower()
-        year = re.search('fy\d\d\d\d', string=string).group()
+        year = re.search('fy\d{4}', string=string).group()
         year = int(re.sub('\D', '', year))
         map_year[year] = fmr_file_name[file]
         if year > max_year:
