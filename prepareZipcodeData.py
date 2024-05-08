@@ -135,6 +135,15 @@ def common_zipcode_mean(fmr_data: pd.DataFrame) -> pd.DataFrame:
 
     :param fmr_data: dataframe containing FMR data for a single-year.
     :return: FMR dataset for each year contains only one entry for each zipcode.
+
+    >>> test_data = pd.read_csv('Data/Test Data/common_zip_data_test.csv', dtype={'ZIPCODE':'string', 'Date':'string'})
+    >>> test_data['Date'] = pd.to_datetime(test_data['Date'])
+    >>> print(test_data['ZIPCODE'].duplicated().sum())
+    2495
+    >>> test_data = common_zipcode_mean(test_data)
+    >>> print(test_data['ZIPCODE'].duplicated().sum())
+    0
+    >>>
     """
 
     # Note: Column index number is used as this is processed dataframe whose layout does not depend on the downloaded
