@@ -1,0 +1,21 @@
+area_code	area_name	display_level	selectable	sort_sequence
+0000	U.S. city average	0	T	1
+0100	Northeast	0	T	5
+0110	New England	1	T	10
+A104	Pittsburgh, PA	1	T	9
+A210	Cleveland-Akron, OH	1	T	19
+D000	Size Class D	0	T	4
+D200	Midwest - Size Class D	1	T	27
+D300	South - Size Class D	1	T	42
+N000	Size Class B/C	0	T	3
+N100	Northeast - Size Class B/C	1	T	13
+N200	Midwest - Size Class B/C	1	T	26
+N300	South - Size Class B/C	1	T	41
+N400	West - Size Class B/C	1	T	58
+S000	Size Class A	0	T	2
+S100	Northeast - Size Class A	1	T	12
+S11A	Boston-Cambridge-Newton, MA-NH	1	T	8
+S37B	Houston-The Woodlands-Sugar Land, TX	1	T	31
+S400	West - Size Class A	1	T	57
+S49C	Riverside-San Bernardino-Ontario, CA	1	T	48
+S49D	Seattle-Tacoma-Bellevue WA	1	T	52
